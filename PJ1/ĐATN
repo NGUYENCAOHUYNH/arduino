@@ -1,0 +1,55 @@
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <Servo.h>
+
+// Khởi tạo LCD với địa chỉ I2C (thường là 0x27 hoặc 0x3F)
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Khởi tạo đối tượng servo
+Servo myServo;
+
+// Cấu hình nút nhấn và trạng thái servo
+const int buttonPin = 22; // Chân nối nút nhấn (sử dụng chân digital trên Mega)
+const int servoPin = 9;   // Chân nối servo (PWM chân 9 trên Mega)
+bool buttonPressed = false;
+int currentAngle = 90;    // Giữ vị trí hiện tại của servo
+
+void setup() {
+  // Thiết lập LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("NGUYEN CAO HUYNH");
+  lcd.setCursor(0, 1);
+  lcd.print("20TDHCLC1");
+
+  // Cấu hình nút nhấn và servo
+  pinMode(buttonPin, INPUT_PULLUP); // Nút nhấn sử dụng chế độ PULLUP
+  myServo.attach(servoPin);        // Gắn servo vào chân 9
+  myServo.write(currentAngle);     // Đặt vị trí ban đầu của servo
+}
+
+void loop() {
+  int buttonState = digitalRead(buttonPin); // Đọc trạng thái nút nhấn
+
+  // Kiểm tra nếu nút được nhấn
+  if (buttonState == LOW && !buttonPressed) {
+    buttonPressed = true; // Đánh dấu nút đã được nhấn
+
+    // Thay đổi góc của servo
+    if (currentAngle == 0) {
+      currentAngle = 90; // Quay 90 độ
+    } else {
+      currentAngle = 0;  // Quay về vị trí cũ
+    }
+    
+    myServo.write(currentAngle); // Cập nhật vị trí servo
+  }
+
+  // Đặt lại trạng thái nút khi thả nút
+  if (buttonState == HIGH) {
+    buttonPressed = false;
+    delay(100);
+  }
+}
